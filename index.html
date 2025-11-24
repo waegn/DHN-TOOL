@@ -1,0 +1,1063 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Heat Network Regulatory Compliance Tool</title>
+
+  <style>
+    :root {
+      --bg: #0a0e13;
+      --bg-card: #141920;
+      --fg: #e8f0f8;
+      --muted: #94a7bd;
+      --accent: #5ba3ff;
+      --accent-hover: #4a8ce0;
+      --accent2: #ffb84d;
+      --border: #1e2730;
+      --border-light: #2a3642;
+      --success: #48d597;
+      --warning: #ffb84d;
+      --danger: #ff6b6b;
+      --gradient-1: linear-gradient(135deg, #5ba3ff 0%, #3d7bcc 100%);
+      --gradient-2: linear-gradient(135deg, #ffb84d 0%, #ff9626 100%);
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.6;
+    }
+
+    .app-header {
+      background: var(--gradient-1);
+      padding: 20px 24px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo {
+      width: 36px;
+      height: 36px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: white;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: rgba(255,255,255,0.85);
+      font-weight: 500;
+      margin-top: -2px;
+    }
+
+    nav {
+      margin-left: auto;
+      display: flex;
+      gap: 8px;
+    }
+
+    nav .tab {
+      background: rgba(255,255,255,0.1);
+      backdrop-filter: blur(10px);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+
+    nav .tab:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-1px);
+    }
+
+    nav .tab.active {
+      background: white;
+      color: var(--accent);
+      border-color: white;
+    }
+
+    main {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+
+    .view {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .view.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    h2 {
+      color: var(--accent);
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h2::before {
+      content: '';
+      width: 4px;
+      height: 28px;
+      background: var(--gradient-1);
+      border-radius: 2px;
+    }
+
+    h3 {
+      color: var(--accent2);
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    fieldset {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+      background: var(--bg-card);
+      transition: border-color 0.2s ease;
+    }
+
+    fieldset:hover {
+      border-color: var(--border-light);
+    }
+
+    legend {
+      padding: 0 8px;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--accent);
+    }
+
+    label {
+      display: flex;
+      flex-direction: column;
+      font-size: 13px;
+      gap: 6px;
+      margin: 10px 0;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    label small {
+      font-size: 11px;
+      color: var(--muted);
+      opacity: 0.7;
+      font-weight: 400;
+    }
+
+    input[type="number"],
+    input[type="date"],
+    input[type="time"],
+    input[type="text"],
+    select {
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.03);
+      color: var(--fg);
+      font-size: 14px;
+      transition: all 0.2s ease;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: rgba(91, 163, 255, 0.05);
+    }
+
+    .actions {
+      margin-top: 24px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .actions button {
+      background: var(--gradient-1);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow);
+    }
+
+    .actions button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(91, 163, 255, 0.3);
+    }
+
+    .actions button:active {
+      transform: translateY(0);
+    }
+
+    .btn-secondary {
+      background: var(--bg-card) !important;
+      border: 1px solid var(--border) !important;
+      color: var(--fg) !important;
+    }
+
+    .btn-secondary:hover {
+      background: var(--border) !important;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: var(--border-light);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .card ul {
+      list-style: none;
+    }
+
+    .card li {
+      margin: 10px 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .card li:last-child {
+      border-bottom: none;
+    }
+
+    .card strong {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 13px;
+    }
+
+    .card span {
+      font-weight: 700;
+      font-size: 16px;
+      color: var(--fg);
+    }
+
+    .flag {
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 13px;
+      display: inline-block;
+    }
+
+    .flag-green {
+      background: rgba(72, 213, 151, 0.15);
+      color: var(--success);
+      border: 1px solid rgba(72, 213, 151, 0.3);
+    }
+
+    .flag-amber {
+      background: rgba(255, 184, 77, 0.15);
+      color: var(--warning);
+      border: 1px solid rgba(255, 184, 77, 0.3);
+    }
+
+    .flag-red {
+      background: rgba(255, 107, 107, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(255, 107, 107, 0.3);
+    }
+
+    .compliance-banner {
+      background: var(--bg-card);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .compliance-banner.critical {
+      border-color: var(--danger);
+      background: rgba(255, 107, 107, 0.05);
+    }
+
+    .compliance-banner.warning {
+      border-color: var(--warning);
+      background: rgba(255, 184, 77, 0.05);
+    }
+
+    .compliance-banner.ready {
+      border-color: var(--success);
+      background: rgba(72, 213, 151, 0.05);
+    }
+
+    .compliance-icon {
+      font-size: 48px;
+      line-height: 1;
+    }
+
+    .compliance-content h3 {
+      margin-bottom: 4px;
+      color: var(--fg);
+    }
+
+    .compliance-content p {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    #report-container {
+      background: white;
+      color: #1a1a1a;
+      padding: 40px;
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+    }
+
+    #report-container h3 {
+      color: #2563eb;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px;
+      margin-top: 24px;
+      margin-bottom: 16px;
+    }
+
+    #report-container h3:first-child {
+      margin-top: 0;
+    }
+
+    #report-container table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0;
+    }
+
+    #report-container th,
+    #report-container td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    #report-container th {
+      background: #f3f4f6;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    #report-container .flag-green { color: #059669; background: #d1fae5; }
+    #report-container .flag-amber { color: #d97706; background: #fef3c7; }
+    #report-container .flag-red { color: #dc2626; background: #fee2e2; }
+
+    .app-footer {
+      margin-top: 40px;
+      padding: 20px;
+      text-align: center;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    @media (max-width: 768px) {
+      .app-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      nav {
+        margin-left: 0;
+        width: 100%;
+      }
+
+      nav .tab {
+        flex: 1;
+        text-align: center;
+        font-size: 12px;
+        padding: 8px;
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .grid,
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media print {
+      body {
+        background: white;
+        color: black;
+      }
+
+      .app-header,
+      .app-footer,
+      nav,
+      .actions {
+        display: none !important;
+      }
+
+      #report-container {
+        box-shadow: none;
+        padding: 0;
+      }
+
+      .card {
+        break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+<header class="app-header">
+  <div class="logo-container">
+    <svg class="logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
+      <path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/>
+    </svg>
+    <div>
+      <h1>Heat Network Compliance Tool</h1>
+      <div class="subtitle">CIBSE CP1 (2020) • HNTAS-Ready Screening</div>
+    </div>
+  </div>
+  <nav>
+    <button id="tab-inputs" class="tab active">Inputs</button>
+    <button id="tab-results" class="tab">Results</button>
+    <button id="tab-nightline" class="tab">Nightline</button>
+    <button id="tab-report" class="tab">Report</button>
+  </nav>
+</header>
+
+<main>
+  <section id="view-inputs" class="view active">
+    <h2>Network Parameters</h2>
+    <form id="inputs-form">
+      <div class="grid">
+        <fieldset>
+          <legend>Thermal Performance</legend>
+          <label>
+            Annual delivered heat (MWh)
+            <input type="number" step="0.01" name="E_delivered_MWh" value="9240">
+          </label>
+          <label>
+            Heating hours per year
+            <input type="number" name="heating_hours" value="4400">
+            <small>Typical UK: 4,000-5,000 hours</small>
+          </label>
+          <label>
+            Flow temperature (°C)
+            <input type="number" name="T_flow_C" value="80">
+          </label>
+          <label>
+            Return temperature (°C)
+            <input type="number" name="T_return_C" value="65">
+            <small>CP1: Should enable condensing (<55°C)</small>
+          </label>
+          <label>
+            Ambient/ground temperature (°C)
+            <input type="number" name="T_amb_C" value="10">
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Hydraulic System</legend>
+          <label>
+            Differential pressure (bar)
+            <input type="number" step="0.01" name="DP_bar" value="2">
+          </label>
+          <label>
+            Pump efficiency
+            <input type="number" step="0.01" name="eta_pump" value="0.75">
+          </label>
+          <label>
+            Motor efficiency
+            <input type="number" step="0.01" name="eta_motor" value="0.90">
+          </label>
+          <label>
+            Water density (kg/m³)
+            <input type="number" name="rho" value="1000">
+          </label>
+          <label>
+            Specific heat (J/kg·K)
+            <input type="number" name="cp" value="4186">
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Distribution Network</legend>
+          <label>
+            Pipe insulation U-value (W/m·K)
+            <input type="number" step="0.01" name="U_W_mK" value="0.30">
+          </label>
+          <label>
+            Total pipe length (m)
+            <input type="number" name="L_m" value="5000">
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Plant & Economics</legend>
+          <label>
+            Boiler efficiency
+            <input type="number" step="0.01" name="eta_boiler" value="0.87">
+          </label>
+          <label>
+            Electricity tariff (£/kWh)
+            <input type="number" step="0.001" name="elec_tariff" value="0.25">
+          </label>
+          <label>
+            Gas tariff (£/kWh)
+            <input type="number" step="0.001" name="gas_tariff" value="0.05">
+          </label>
+          <label>
+            Grid EF (kgCO₂/kWh)
+            <input type="number" step="0.001" name="elec_EF" value="0.233">
+          </label>
+          <label>
+            Gas EF (kgCO₂/kWh)
+            <input type="number" step="0.001" name="gas_EF" value="0.183">
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Nightline Data</legend>
+          <label>
+            Design/healthy ΔT (°C)
+            <input type="number" name="DT_design_healthy" value="40">
+          </label>
+          <label>
+            Recorded ΔT at snapshot (°C)
+            <input type="number" name="DT_night_C" value="5">
+          </label>
+          <label>
+            Plant flow at snapshot (L/s)
+            <input type="number" step="0.1" name="Q_2am_Ls" value="60">
+          </label>
+          <label>
+            Number of HIUs
+            <input type="number" name="N_HIUs" value="1000">
+          </label>
+          <label>
+            Keep-warm per HIU (L/s)
+            <input type="number" step="0.0001" name="q_keepwarm_per_HIU" value="0.00125">
+          </label>
+          <label>
+            Fault bypass per HIU (L/s)
+            <input type="number" step="0.01" name="q_fault_Ls" value="0.2">
+          </label>
+        </fieldset>
+
+        <fieldset>
+          <legend>Snapshot Conditions</legend>
+          <label>
+            Outside air temp (°C)
+            <input type="number" step="0.1" name="OAT_2am_C" value="-1.2">
+          </label>
+          <label>
+            Design outside temp (°C)
+            <input type="number" name="OAT_design" value="-3">
+          </label>
+          <label>
+            Snapshot time
+            <input type="time" name="time_local" value="02:00">
+          </label>
+          <label>
+            Day type
+            <select name="day_type">
+              <option value="weekday">Weekday</option>
+              <option value="weekend">Weekend</option>
+            </select>
+          </label>
+        </fieldset>
+      </div>
+
+      <div class="actions">
+        <button type="button" id="btn-calc">Calculate Compliance</button>
+        <button type="button" id="btn-load" class="btn-secondary">Load Example</button>
+        <button type="button" id="btn-save" class="btn-secondary">Export JSON</button>
+      </div>
+    </form>
+  </section>
+
+  <section id="view-results" class="view">
+    <h2>Results & Compliance</h2>
+    
+    <div class="compliance-banner" id="compliance-banner">
+      <div class="compliance-icon">⚠️</div>
+      <div class="compliance-content">
+        <h3 id="compliance-status-title">Run calculation...</h3>
+        <p id="compliance-status-text">Click Calculate to see HNTAS readiness</p>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <h3>System Overview</h3>
+        <ul>
+          <li><strong>Design ΔT</strong> <span id="kpi-dt">–</span></li>
+          <li><strong>Mean temp</strong> <span id="kpi-tmean">–</span></li>
+          <li><strong>Return temp</strong> <span id="kpi-treturn">–</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Pump Energy</h3>
+        <ul>
+          <li><strong>Intensity</strong> <span id="kpi-pump-intensity">–</span></li>
+          <li><strong>Annual MWh</strong> <span id="kpi-pump-mwh">–</span></li>
+          <li><strong>CO₂ t/yr</strong> <span id="kpi-pump-co2">–</span></li>
+          <li><strong>Cost/yr</strong> <span id="kpi-pump-gbp">–</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Distribution</h3>
+        <ul>
+          <li><strong>Linear loss</strong> <span id="kpi-qwm">–</span></li>
+          <li><strong>Total kW</strong> <span id="kpi-dist-kw">–</span></li>
+          <li><strong>Annual MWh</strong> <span id="kpi-dist-mwh">–</span></li>
+          <li><strong>CO₂ t/yr</strong> <span id="kpi-dist-co2">–</span></li>
+          <li><strong>Cost/yr</strong> <span id="kpi-dist-gbp">–</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Gas (Boiler)</h3>
+        <ul>
+          <li><strong>Annual MWh</strong> <span id="kpi-gas-mwh">–</span></li>
+          <li><strong>CO₂ t/yr</strong> <span id="kpi-gas-co2">–</span></li>
+          <li><strong>Cost/yr</strong> <span id="kpi-gas-gbp">–</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Totals</h3>
+        <ul>
+          <li><strong>Total CO₂</strong> <span id="kpi-total-co2">–</span></li>
+          <li><strong>Total cost</strong> <span id="kpi-total-gbp">–</span></li>
+        </ul>
+      </div>
+
+      <div class="card" style="grid-column: 1 / -1;">
+        <h3>CP1 / HNTAS Compliance</h3>
+        <ul>
+          <li><strong>ΔT Performance</strong> <span id="kpi-dt-flag" class="flag">–</span></li>
+          <li><strong>Return Temp</strong> <span id="kpi-return-flag" class="flag">–</span></li>
+          <li><strong>Distribution Loss</strong> <span id="kpi-distloss-flag" class="flag">–</span></li>
+          <li><strong>HIU Bypass</strong> <span id="kpi-bypass-flag" class="flag">–</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-nightline" class="view">
+    <h2>Nightline Analysis</h2>
+    
+    <div class="cards">
+      <div class="card">
+        <h3>Bypass Metrics</h3>
+        <ul>
+          <li><strong>Design ΔT</strong> <span id="kpi-design-dt">–</span></li>
+          <li><strong>Snapshot ΔT</strong> <span id="kpi-snapshot-dt">–</span></li>
+          <li><strong>Raw bypass</strong> <span id="kpi-bypass-raw">–</span></li>
+          <li><strong>Effective bypass</strong> <span id="kpi-bypass-eff">–</span></li>
+          <li><strong>Bypass flow</strong> <span id="kpi-bypass-flow">–</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Fault Estimation</h3>
+        <ul>
+          <li><strong>Keep-warm flow</strong> <span id="kpi-keepwarm-flow">–</span></li>
+          <li><strong>Excess flow</strong> <span id="kpi-excess-flow">–</span></li>
+          <li><strong>Est. faults</strong> <span id="kpi-faulty">–</span></li>
+          <li><strong>% of HIUs</strong> <span id="kpi-faulty-pct">–</span></li>
+        </ul>
+      </div>
+
+      <div class="card">
+        <h3>Adjustments</h3>
+        <ul>
+          <li><strong>OAT factor</strong> <span id="kpi-cold-factor">–</span></li>
+          <li><strong>Time factor</strong> <span id="kpi-tod-factor">–</span></li>
+          <li><strong>Combined</strong> <span id="kpi-combined-factor">–</span></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-report" class="view">
+    <h2>Printable Report</h2>
+    <div id="report-container"></div>
+    <div class="actions">
+      <button id="btn-print">Print / PDF</button>
+    </div>
+  </section>
+</main>
+
+<footer class="app-footer">
+  <p>Heat Network Regulatory Compliance Tool</p>
+  <p>CIBSE CP1 (2020) • HNTAS Readiness</p>
+  <p style="margin-top: 8px;">© 2025 Wayne Steer</p>
+</footer>
+
+<script>
+window.addEventListener("DOMContentLoaded", () => {
+  function num(v) { return Number.parseFloat(v ?? 0); }
+  function fmt(v, d = 2) { return isFinite(v) ? Number(v).toFixed(d) : "–"; }
+  function barToPa(bar) { return bar * 100000; }
+
+  function computeCore(inputs) {
+    const E_delivered_MWh = num(inputs.E_delivered_MWh);
+    const heating_hours = num(inputs.heating_hours);
+    const T_flow_C = num(inputs.T_flow_C);
+    const T_return_C = num(inputs.T_return_C);
+    const DT_C = T_flow_C - T_return_C;
+    const T_amb_C = num(inputs.T_amb_C);
+    const DP_bar = num(inputs.DP_bar);
+    const eta_pump = num(inputs.eta_pump);
+    const eta_motor = num(inputs.eta_motor);
+    const U_W_mK = num(inputs.U_W_mK);
+    const L_m = num(inputs.L_m);
+    const rho = num(inputs.rho);
+    const cp = num(inputs.cp);
+    const eta_boiler = num(inputs.eta_boiler);
+
+    const DT_safe = DT_C > 0 ? DT_C : 1;
+    const Pump_kWh_per_MWh = (barToPa(DP_bar) / (eta_pump * eta_motor * rho * cp * DT_safe)) * 1000;
+    const AnnualPump_MWh = (E_delivered_MWh * Pump_kWh_per_MWh) / 1000;
+    const T_mean_C = (T_flow_C + T_return_C) / 2;
+    const q_W_m = U_W_mK * (T_mean_C - T_amb_C);
+    const Dist_kW = (q_W_m * L_m) / 1000;
+    const Dist_MWh = (Dist_kW * heating_hours) / 1000;
+    const Gas_MWh = (E_delivered_MWh + Dist_MWh) / eta_boiler;
+
+    return { E_delivered_MWh, DT_C, T_mean_C, T_return_C, Pump_kWh_per_MWh, AnnualPump_MWh, q_W_m, Dist_kW, Dist_MWh, Gas_MWh };
+  }
+
+  function computeEconomics(core, inputs) {
+    const elec_tariff = num(inputs.elec_tariff);
+    const gas_tariff = num(inputs.gas_tariff);
+    const elec_EF = num(inputs.elec_EF);
+    const gas_EF = num(inputs.gas_EF);
+    const Pump_CO2_t = core.AnnualPump_MWh * elec_EF;
+    const Dist_CO2_t = core.Dist_MWh * gas_EF;
+    const Gas_CO2_t = core.Gas_MWh * gas_EF;
+    const Pump_GBP = core.AnnualPump_MWh * 1000 * elec_tariff;
+    const Dist_GBP = core.Dist_MWh * 1000 * gas_tariff;
+    const Gas_GBP = core.Gas_MWh * 1000 * gas_tariff;
+    const Total_CO2_t = Pump_CO2_t + Dist_CO2_t + Gas_CO2_t;
+    const Total_GBP = Pump_GBP + Dist_GBP + Gas_GBP;
+    return { Pump_CO2_t, Dist_CO2_t, Gas_CO2_t, Total_CO2_t, Pump_GBP, Dist_GBP, Gas_GBP, Total_GBP };
+  }
+
+  function getColdFactor(OAT, OAT_design) {
+    const OAT_off = 15;
+    let norm = (OAT - OAT_design) / (OAT_off - OAT_design);
+    norm = Math.max(0, Math.min(1, norm));
+    return 0.3 + 0.7 * norm;
+  }
+
+  function getTimeOfDayFactor(timeStr, dayType) {
+    let hour = 2;
+    if (timeStr && timeStr.includes(":")) {
+      const h = parseInt(timeStr.split(":")[0], 10);
+      if (!isNaN(h)) hour = h;
+    }
+    const isWeekend = dayType === "weekend";
+    if (!isWeekend) {
+      if (hour < 5) return 0.7;
+      else if (hour < 9) return 0.4;
+      else if (hour < 16) return 0.6;
+      else if (hour < 22) return 0.4;
+      else return 0.6;
+    } else {
+      if (hour < 6) return 0.7;
+      else if (hour < 11) return 0.5;
+      else if (hour < 18) return 0.5;
+      else return 0.5;
+    }
+  }
+
+  function computeNightline(inputs) {
+    const DT_design = num(inputs.DT_design_healthy) || 40;
+    const DT_recorded = num(inputs.DT_night_C);
+    const Q_2am_Ls = num(inputs.Q_2am_Ls);
+    const q_fault_Ls = num(inputs.q_fault_Ls);
+    const N_HIUs = num(inputs.N_HIUs);
+    const q_keepwarm_per_HIU = num(inputs.q_keepwarm_per_HIU);
+    const OAT = num(inputs.OAT_2am_C);
+    const OAT_design = num(inputs.OAT_design);
+    const time_local = inputs.time_local || "02:00";
+    const day_type = inputs.day_type || "weekday";
+
+    const Q_keepwarm_baseline = q_keepwarm_per_HIU * N_HIUs;
+    const Q_excess = Math.max(0, Q_2am_Ls - Q_keepwarm_baseline);
+    let f_bypass_raw = 0;
+    if (DT_design > 0) f_bypass_raw = 1 - DT_recorded / DT_design;
+    f_bypass_raw = Math.max(0, Math.min(1, f_bypass_raw));
+
+    const f_cold = getColdFactor(OAT, OAT_design);
+    const f_tod = getTimeOfDayFactor(time_local, day_type);
+    const faultMultiplier = f_cold * f_tod;
+    const f_bypass_eff = f_bypass_raw * faultMultiplier;
+    const Q_bypass_Ls = f_bypass_eff * Q_excess;
+    const N_fault = q_fault_Ls > 0 ? Q_bypass_Ls / q_fault_Ls : 0;
+    const faulty_pct = N_HIUs > 0 ? (N_fault / N_HIUs) * 100 : 0;
+    const bypass_pct_flow = Q_excess > 0 ? (Q_bypass_Ls / Q_2am_Ls) * 100 : 0;
+
+    return { DT_design, DT_recorded, f_bypass_raw, f_bypass_eff, bypass_pct_flow, Q_bypass_Ls, Q_keepwarm_baseline, Q_excess, N_fault, faulty_pct, N_HIUs, OAT, time_local, day_type, f_cold, f_tod, faultMultiplier };
+  }
+
+  function renderReport(core, econ, night) {
+    let failCount = 0, warnCount = 0;
+    if (core.DT_C < 20) failCount++; else if (core.DT_C < 30) warnCount++;
+    if (core.T_return_C > 55) failCount++;
+    const totalHeat = core.E_delivered_MWh + core.Dist_MWh;
+    const distLossPct = (core.Dist_MWh / totalHeat) * 100;
+    if (distLossPct > 20) failCount++; else if (distLossPct > 10) warnCount++;
+    if (night.bypass_pct_flow > 60) failCount++; else if (night.bypass_pct_flow > 40) warnCount++;
+
+    let status = failCount >= 2 ? "NOT READY" : (failCount === 1 || warnCount >= 2) ? "NEEDS ATTENTION" : "HNTAS-READY";
+
+    return `
+      <h3>Executive Summary</h3>
+      <p>Status: <strong>${status}</strong></p>
+      <p>Design ΔT ${fmt(core.DT_C)}°C, snapshot ΔT ${fmt(night.DT_recorded)}°C. 
+      Annual heat ${fmt(core.E_delivered_MWh)} MWh, emissions ${fmt(econ.Total_CO2_t)} tCO₂/yr, 
+      cost £${fmt(econ.Total_GBP, 0)}/yr.</p>
+
+      <h3>Compliance Status</h3>
+      <table>
+        <tr><th>Check</th><th>Result</th><th>Status</th></tr>
+        <tr><td>ΔT</td><td>${fmt(core.DT_C)}°C</td><td>${core.DT_C >= 30 ? '✓ PASS' : core.DT_C >= 20 ? '⚠ WARNING' : '✗ FAIL'}</td></tr>
+        <tr><td>Return Temp</td><td>${fmt(core.T_return_C)}°C</td><td>${core.T_return_C <= 55 ? '✓ PASS' : '✗ FAIL'}</td></tr>
+        <tr><td>Dist Loss</td><td>${fmt(distLossPct, 1)}%</td><td>${distLossPct <= 10 ? '✓ PASS' : distLossPct <= 20 ? '⚠ WARNING' : '✗ FAIL'}</td></tr>
+        <tr><td>Bypass</td><td>${fmt(night.bypass_pct_flow)}%</td><td>${night.bypass_pct_flow <= 40 ? '✓ PASS' : night.bypass_pct_flow <= 60 ? '⚠ WARNING' : '✗ FAIL'}</td></tr>
+      </table>
+
+      <h3>Energy Breakdown</h3>
+      <table>
+        <tr><th>Component</th><th>MWh/yr</th><th>£/yr</th><th>tCO₂/yr</th></tr>
+        <tr><td>Pump</td><td>${fmt(core.AnnualPump_MWh)}</td><td>${fmt(econ.Pump_GBP, 0)}</td><td>${fmt(econ.Pump_CO2_t)}</td></tr>
+        <tr><td>Distribution</td><td>${fmt(core.Dist_MWh)}</td><td>${fmt(econ.Dist_GBP, 0)}</td><td>${fmt(econ.Dist_CO2_t)}</td></tr>
+        <tr><td>Gas</td><td>${fmt(core.Gas_MWh)}</td><td>${fmt(econ.Gas_GBP, 0)}</td><td>${fmt(econ.Gas_CO2_t)}</td></tr>
+        <tr style="font-weight:bold;"><td>TOTAL</td><td>${fmt(core.E_delivered_MWh + core.Dist_MWh)}</td><td>${fmt(econ.Total_GBP, 0)}</td><td>${fmt(econ.Total_CO2_t)}</td></tr>
+      </table>
+
+      <h3>Nightline Bypass Analysis</h3>
+      <p>Estimated faulty HIUs: <strong>${fmt(night.N_fault, 0)} units (${fmt(night.faulty_pct, 1)}%)</strong></p>
+      <p>Methodology: BESA/CP1-aligned with OAT and time-of-day adjustments.</p>
+    `;
+  }
+
+  const tabs = ["inputs", "results", "nightline", "report"];
+  function showTab(t) {
+    document.querySelectorAll(".tab").forEach(el => el.classList.remove("active"));
+    document.getElementById(`tab-${t}`).classList.add("active");
+    document.querySelectorAll(".view").forEach(v => v.classList.remove("active"));
+    document.getElementById(`view-${t}`).classList.add("active");
+  }
+  tabs.forEach(t => {
+    document.getElementById(`tab-${t}`).addEventListener("click", () => showTab(t));
+  });
+
+  const form = document.getElementById("inputs-form");
+  const defaultInputs = {
+    E_delivered_MWh: 9240, heating_hours: 4400, T_flow_C: 80, T_return_C: 65, T_amb_C: 10,
+    DP_bar: 2, eta_pump: 0.75, eta_motor: 0.9, rho: 1000, cp: 4186, U_W_mK: 0.3, L_m: 5000,
+    eta_boiler: 0.87, elec_tariff: 0.25, gas_tariff: 0.05, elec_EF: 0.233, gas_EF: 0.183,
+    DT_design_healthy: 40, DT_night_C: 5, Q_2am_Ls: 60, q_fault_Ls: 0.2, N_HIUs: 1000,
+    q_keepwarm_per_HIU: 0.00125, OAT_2am_C: -1.2, OAT_design: -3, time_local: "02:00", day_type: "weekday"
+  };
+
+  function readInputs() {
+    const data = {};
+    new FormData(form).forEach((v, k) => {
+      data[k] = ["day_type", "time_local"].includes(k) ? v : parseFloat(v) || 0;
+    });
+    return data;
+  }
+
+  function setInputs(obj) {
+    Object.entries(obj).forEach(([k, v]) => {
+      const el = form.querySelector(`[name="${k}"]`);
+      if (el) el.value = v;
+    });
+  }
+
+  function setFlag(id, status, text) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.className = "flag" + (status ? ` flag-${status}` : "");
+      el.textContent = text ?? "–";
+    }
+  }
+
+  function updateBanner(fail, warn) {
+    const banner = document.getElementById("compliance-banner");
+    const title = document.getElementById("compliance-status-title");
+    const text = document.getElementById("compliance-status-text");
+    const icon = banner.querySelector(".compliance-icon");
+
+    if (fail >= 2) {
+      banner.className = "compliance-banner critical";
+      icon.textContent = "❌";
+      title.textContent = "NOT READY FOR HNTAS";
+      text.textContent = `${fail} critical failures. Immediate action required.`;
+    } else if (fail === 1 || warn >= 2) {
+      banner.className = "compliance-banner warning";
+      icon.textContent = "⚠️";
+      title.textContent = "NEEDS ATTENTION";
+      text.textContent = `${fail + warn} issues before HNTAS enforcement.`;
+    } else {
+      banner.className = "compliance-banner ready";
+      icon.textContent = "✅";
+      title.textContent = "HNTAS-READY";
+      text.textContent = "Meets CP1 requirements.";
+    }
+  }
+
+  function updateUI(core, econ, night) {
+    document.getElementById("kpi-dt").textContent = core.DT_C.toFixed(1) + "°C";
+    document.getElementById("kpi-tmean").textContent = core.T_mean_C.toFixed(1) + "°C";
+    document.getElementById("kpi-treturn").textContent = core.T_return_C.toFixed(1) + "°C";
+    document.getElementById("kpi-pump-intensity").textContent = core.Pump_kWh_per_MWh.toFixed(1) + " kWh/MWh";
+    document.getElementById("kpi-pump-mwh").textContent = core.AnnualPump_MWh.toFixed(1) + " MWh";
+    document.getElementById("kpi-pump-co2").textContent = econ.Pump_CO2_t.toFixed(1) + " t";
+    document.getElementById("kpi-pump-gbp").textContent = "£" + fmt(econ.Pump_GBP, 0);
+    document.getElementById("kpi-qwm").textContent = core.q_W_m.toFixed(2) + " W/m";
+    document.getElementById("kpi-dist-kw").textContent = core.Dist_kW.toFixed(1) + " kW";
+    document.getElementById("kpi-dist-mwh").textContent = core.Dist_MWh.toFixed(1) + " MWh";
+    document.getElementById("kpi-dist-co2").textContent = econ.Dist_CO2_t.toFixed(1) + " t";
+    document.getElementById("kpi-dist-gbp").textContent = "£" + fmt(econ.Dist_GBP, 0);
+    document.getElementById("kpi-gas-mwh").textContent = core.Gas_MWh.toFixed(1) + " MWh";
+    document.getElementById("kpi-gas-co2").textContent = econ.Gas_CO2_t.toFixed(1) + " t";
+    document.getElementById("kpi-gas-gbp").textContent = "£" + fmt(econ.Gas_GBP, 0);
+    document.getElementById("kpi-total-co2").textContent = econ.Total_CO2_t.toFixed(1) + " t";
+    document.getElementById("kpi-total-gbp").textContent = "£" + fmt(econ.Total_GBP, 0);
+
+    let fail = 0, warn = 0;
+    if (core.DT_C < 20) { setFlag("kpi-dt-flag", "red", "FAIL: " + core.DT_C.toFixed(1) + "°C"); fail++; }
+    else if (core.DT_C < 30) { setFlag("kpi-dt-flag", "amber", "WARNING: " + core.DT_C.toFixed(1) + "°C"); warn++; }
+    else { setFlag("kpi-dt-flag", "green", "PASS: " + core.DT_C.toFixed(1) + "°C"); }
+
+    if (core.T_return_C > 55) { setFlag("kpi-return-flag", "red", "FAIL: " + core.T_return_C.toFixed(1) + "°C"); fail++; }
+    else { setFlag("kpi-return-flag", "green", "PASS: " + core.T_return_C.toFixed(1) + "°C"); }
+
+    const distPct = (core.Dist_MWh / (core.E_delivered_MWh + core.Dist_MWh)) * 100;
+    if (distPct > 20) { setFlag("kpi-distloss-flag", "red", "FAIL: " + distPct.toFixed(1) + "%"); fail++; }
+    else if (distPct > 10) { setFlag("kpi-distloss-flag", "amber", "WARNING: " + distPct.toFixed(1) + "%"); warn++; }
+    else { setFlag("kpi-distloss-flag", "green", "PASS: " + distPct.toFixed(1) + "%"); }
+
+    const bypassPct = night.bypass_pct_flow;
+    if (bypassPct > 60) { setFlag("kpi-bypass-flag", "red", "FAIL: " + bypassPct.toFixed(0) + "%"); fail++; }
+    else if (bypassPct > 40) { setFlag("kpi-bypass-flag", "amber", "WARNING: " + bypassPct.toFixed(0) + "%"); warn++; }
+    else { setFlag("kpi-bypass-flag", "green", "PASS: " + bypassPct.toFixed(0) + "%"); }
+
+    updateBanner(fail, warn);
+
+    document.getElementById("kpi-design-dt").textContent = night.DT_design.toFixed(1) + "°C";
+    document.getElementById("kpi-snapshot-dt").textContent = night.DT_recorded.toFixed(1) + "°C";
+    document.getElementById("kpi-bypass-raw").textContent = (night.f_bypass_raw * 100).toFixed(1) + "%";
+    document.getElementById("kpi-bypass-eff").textContent = (night.f_bypass_eff * 100).toFixed(1) + "%";
+    document.getElementById("kpi-bypass-flow").textContent = night.Q_bypass_Ls.toFixed(1) + " L/s";
+    document.getElementById("kpi-keepwarm-flow").textContent = night.Q_keepwarm_baseline.toFixed(2) + " L/s";
+    document.getElementById("kpi-excess-flow").textContent = night.Q_excess.toFixed(1) + " L/s";
+    document.getElementById("kpi-faulty").textContent = "~" + night.N_fault.toFixed(0);
+    document.getElementById("kpi-faulty-pct").textContent = night.faulty_pct.toFixed(1) + "%";
+    document.getElementById("kpi-cold-factor").textContent = night.f_cold.toFixed(2);
+    document.getElementById("kpi-tod-factor").textContent = night.f_tod.toFixed(2);
+    document.getElementById("kpi-combined-factor").textContent = night.faultMultiplier.toFixed(2);
+    document.getElementById("report-container").innerHTML = renderReport(core, econ, night);
+  }
+
+  document.getElementById("btn-calc").addEventListener("click", () => {
+    const inputs = readInputs();
+    const core = computeCore(inputs);
+    const econ = computeEconomics(core, inputs);
+    const night = computeNightline(inputs);
+    updateUI(core, econ, night);
+    showTab("results");
+  });
+
+  document.getElementById("btn-load").addEventListener("click", () => setInputs(defaultInputs));
+
+  document.getElementById("btn-save").addEventListener("click", () => {
+    const blob = new Blob([JSON.stringify(readInputs(), null, 2)], { type: "application/json" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "heat_network_" + new Date().toISOString().split('T')[0] + ".json";
+    a.click();
+  });
+
+  document.getElementById("btn-print").addEventListener("click", () => window.print());
+
+  setInputs(defaultInputs);
+  document.getElementById("btn-calc").click();
+});
+</script>
+</body>
+</html>
